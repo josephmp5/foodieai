@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCuOp6GzTgr1Xe1bzJXRVhs2K4DUqyZQ-Q</string>
+	<key>GCM_SENDER_ID</key>
+	<string>57416163017</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.josephmp5.heutebinichrichbaba</string>
+	<key>PROJECT_ID</key>
+	<string>heutebinichrichbaba</string>
+	<key>STORAGE_BUCKET</key>
+	<string>heutebinichrichbaba.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:57416163017:ios:2704ee610552feec3eb718</string>
+</dict>
+</plist>
