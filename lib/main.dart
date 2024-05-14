@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:heutebinichrichbaba/home_page.dart';
-import 'package:heutebinichrichbaba/onboard_page.dart';
+import 'package:heutebinichrichbaba/pages.dart';
+import 'package:heutebinichrichbaba/pages/home_page.dart';
+import 'package:heutebinichrichbaba/pages/onboard_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData && snapshot.data != null) {
               // Ensure the user is not null
               String userId = snapshot.data!.uid;
-              return const HomePage();
+              return const Pages();
               // Navigate to the HomePage if signed in
             }
             return const OnBoardPage(); // Otherwise, show the SignUp page
