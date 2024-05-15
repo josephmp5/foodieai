@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class RandomRecipe extends StatefulWidget {
-  const RandomRecipe({super.key, required this.recipeText});
+  const RandomRecipe(
+      {super.key, required this.recipeText, required this.imageUrl});
 
   final String recipeText;
+  final String imageUrl;
 
   @override
   State<RandomRecipe> createState() => _RandomRecipeState();
@@ -37,6 +38,10 @@ class _RandomRecipeState extends State<RandomRecipe> {
             scrollDirection: Axis.vertical,
             child: Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Image.network(widget.imageUrl),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: Text(widget.recipeText,

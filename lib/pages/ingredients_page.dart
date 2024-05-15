@@ -24,7 +24,7 @@ class _IngredientsState extends State<Ingredients> {
     });
 
     await auth.generateRecipewithIngredients(
-        selectedCuisine!, ingredientsController.toString(), context);
+        selectedCuisine!, ingredientsController.text, context);
     setState(() {
       isLoading = false; // Stop loading after the API call
     });

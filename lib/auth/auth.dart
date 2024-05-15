@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 class Auth {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   Future<void> signInAnonymously({required BuildContext context}) async {
     try {
       final userCredential = await _auth.signInAnonymously();
@@ -35,7 +35,8 @@ class Auth {
     }
   }
 
-  Future<String> generateRecipe(String cuisine, BuildContext context) async {
+  Future<Map<String, String>> generateRecipe(
+      String cuisine, BuildContext context) async {
     try {
       var response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
@@ -58,18 +59,24 @@ class Auth {
       if (response.statusCode == 200) {
         String recipeText =
             json.decode(response.body)['choices'][0]['message']['content'];
-        return recipeText;
+        // Extract the recipe name (assuming it's the first line)
+        String recipeName = recipeText.split('\n')[0];
+        // Generate the image using the recipe name
+        String imageUrl = await generateImage(recipeName);
+        return {
+          'recipeName': recipeName,
+          'recipeText': recipeText,
+          'imageUrl': imageUrl
+        };
       } else {
-        // Handle different statuses or API specific errors
         throw Exception('Failed to fetch recipe: ${response.body}');
       }
     } catch (e) {
-      // Handle unexpected errors
       throw Exception('Failed to connect to the API: $e');
     }
   }
 
-  Future<String> generateRecipewithIngredients(
+  Future<Map<String, String>> generateRecipewithIngredients(
       String cuisine, String ingredients, BuildContext context) async {
     try {
       var response = await http.post(
@@ -93,18 +100,51 @@ class Auth {
       if (response.statusCode == 200) {
         String recipeText =
             json.decode(response.body)['choices'][0]['message']['content'];
+        // Extract the recipe name (assuming it's the first line)
+        String recipeName = recipeText.split('\n')[0];
+        // Generate the image using the recipe name
+        String imageUrl = await generateImage(recipeName);
+
+        // Navigate to the RandomRecipe page with recipeText and imageUrl
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => RandomRecipe(recipeText: recipeText)),
+            builder: (context) =>
+                RandomRecipe(recipeText: recipeText, imageUrl: imageUrl),
+          ),
         );
-        return recipeText;
+
+        return {'recipeText': recipeText, 'imageUrl': imageUrl};
       } else {
-        // Handle different statuses or API specific errors
         throw Exception('Failed to fetch recipe: ${response.body}');
       }
     } catch (e) {
-      // Handle unexpected errors
+      throw Exception('Failed to connect to the API: $e');
+    }
+  }
+
+  Future<String> generateImage(String prompt) async {
+    try {
+      var response = await http.post(
+        Uri.parse('https://api.openai.com/v1/images/generations'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${Constants.uri}',
+        },
+        body: jsonEncode({
+          'prompt': prompt,
+          'n': 1,
+          'size': '1024x1024',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        String imageUrl = json.decode(response.body)['data'][0]['url'];
+        return imageUrl;
+      } else {
+        throw Exception('Failed to generate image: ${response.body}');
+      }
+    } catch (e) {
       throw Exception('Failed to connect to the API: $e');
     }
   }
