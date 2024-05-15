@@ -33,25 +33,35 @@ class _HomePageState extends State<HomePage> {
 
   void startSpinAndFetchRecipe() {
     if (!isFetchingRecipe && selectedCuisine != null) {
-      isFetchingRecipe = true;
-      selected.add(Fortune.randomInt(0, imageAssets.length));
+      setState(() {
+        isFetchingRecipe = true;
+      });
+
+      // Keep the wheel spinning
+      _keepSpinning();
 
       // Start fetching the recipe immediately
       var recipeFuture = auth.generateRecipe(selectedCuisine!, context);
 
-      // Delay the completion of fetching to synchronize with the wheel animation
-      Future.delayed(const Duration(seconds: 7), () {
-        recipeFuture.then((recipeText) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => RandomRecipe(recipeText: recipeText)),
-          ).then((_) {
+      // Wait for the recipe to be ready
+      recipeFuture.then((recipe) {
+        String recipeText = recipe['recipeText']!;
+        String imageUrl = recipe['imageUrl']!;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                RandomRecipe(recipeText: recipeText, imageUrl: imageUrl),
+          ),
+        ).then((_) {
+          setState(() {
             isFetchingRecipe = false; // Reset state after coming back
           });
-        }).catchError((error) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error fetching recipe: $error')));
+        });
+      }).catchError((error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error fetching recipe: $error')));
+        setState(() {
           isFetchingRecipe = false;
         });
       });
@@ -59,6 +69,15 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a cuisine first')));
     }
+  }
+
+  void _keepSpinning() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (isFetchingRecipe) {
+        selected.add(Fortune.randomInt(0, imageAssets.length));
+        _keepSpinning();
+      }
+    });
   }
 
   @override
@@ -136,7 +155,6 @@ class _HomePageState extends State<HomePage> {
                       .map((path) => FortuneItem(
                           child: Image.asset(path, width: 80, height: 80)))
                       .toList(),
-                  onAnimationEnd: () {},
                 ),
               ),
               const SizedBox(height: 30),

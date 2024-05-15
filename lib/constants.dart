@@ -1,3 +1,3 @@
 class Constants {
-  static String uri = 'OPENAI_API_KEY';
+  static String uri = 'OPENAI_API_URI';
 }
