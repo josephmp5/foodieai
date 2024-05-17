@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class RandomRecipe extends StatefulWidget {
@@ -40,7 +41,13 @@ class _RandomRecipeState extends State<RandomRecipe> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Image.network(widget.imageUrl),
+                  child: CachedNetworkImage(
+                    imageUrl: widget.imageUrl,
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(12.0),
