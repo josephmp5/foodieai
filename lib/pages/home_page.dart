@@ -17,6 +17,10 @@ class _HomePageState extends State<HomePage> {
   final selected = BehaviorSubject<int>();
   bool isFetchingRecipe = false;
 
+  void signout() async {
+    await auth.signOut(context);
+  }
+
   final List<String> imageAssets = [
     'assets/spin/pizza.png',
     'assets/spin/manti.png',
@@ -59,8 +63,14 @@ class _HomePageState extends State<HomePage> {
           });
         });
       }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error fetching recipe: $error')));
+        if (error.toString().contains('Daily limit reached')) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  'Daily limit reached. Please buy tokens to get more recipes.')));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error fetching recipe: $error')));
+        }
         setState(() {
           isFetchingRecipe = false;
         });
@@ -85,9 +95,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text('Home Page'),
-      ),
+          backgroundColor: Colors.transparent,
+          title: const Text('Home Page'),
+          leading: IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: signout,
+          )),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
