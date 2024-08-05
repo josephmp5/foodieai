@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heutebinichrichbaba/pages/home_page.dart';
+import 'package:heutebinichrichbaba/pages/home_screen.dart';
 import 'package:heutebinichrichbaba/pages/ingredients_page.dart';
 
 class Pages extends StatefulWidget {
@@ -15,7 +16,7 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -41,6 +42,7 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
         children: <Widget>[
           const HomePage(),
           const Ingredients(),
+          HomeScreen(),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -75,6 +77,13 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
                       size: MediaQuery.of(context).size.width > 600 ? 48 : 30,
                     ),
                     text: "Ingredients Recipe",
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.token_outlined,
+                      size: MediaQuery.of(context).size.width > 600 ? 48 : 30,
+                    ),
+                    text: "Buy Tokens",
                   ),
                 ],
                 controller: _tabController,
