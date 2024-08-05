@@ -22,6 +22,7 @@ class Auth {
       if (user != null) {
         await FirebaseFirestore.instance.collection("users").doc(user.uid).set({
           'uid': user.uid,
+          'tokens': 5,
         });
 
         await MyApp.navigatorKey.currentState
@@ -43,26 +44,26 @@ class Auth {
     User? user = _auth.currentUser;
     if (user == null) throw Exception("User not logged in.");
 
-    var docRef = _db.collection('dailyUsage').doc(user.uid);
+    var docRef = _db.collection('users').doc(user.uid);
     var doc = await docRef.get();
-    DateTime today = DateTime.now();
 
-    if (doc.exists && _isToday(doc.data()?['lastRequest'].toDate())) {
-      int count = doc.data()?['count'] ?? 0;
-      if (count >= 10) {
-        showSnackBar(context,
-            'Daily limit reached. Please buy tokens to get more recipes.');
+    if (doc.exists) {
+      int tokens = doc.data()?['tokens'] ?? 0;
+      if (tokens <= 0) {
+        showSnackBar(context, 'No tokens left. Please buy more tokens.');
         return {};
       }
+
+      // Deduct one token
+      await docRef.update({
+        'tokens': FieldValue.increment(-1),
+      });
+
+      // Proceed with generating the recipe
+      return _fetchRecipeFromAPI(cuisine);
+    } else {
+      throw Exception('User document not found');
     }
-
-    await docRef.set({
-      'count': FieldValue.increment(1),
-      'lastRequest': Timestamp.fromDate(today),
-    }, SetOptions(merge: true));
-
-    return _fetchRecipeFromAPI(
-        cuisine); // Assume this handles the API call and extracts data properly.
   }
 
   bool _isToday(DateTime? lastRequestDate) {
@@ -80,7 +81,7 @@ class Auth {
         'Authorization': 'Bearer ${Constants.uri}',
       },
       body: jsonEncode({
-        'model': 'gpt-3.5-turbo-0125',
+        'model': 'gpt-4o-mini-2024-07-18',
         'messages': [
           {
             'role': 'user',
@@ -113,26 +114,26 @@ class Auth {
     User? user = _auth.currentUser;
     if (user == null) throw Exception("User not logged in.");
 
-    var docRef = _db.collection('dailyUsage').doc(user.uid);
+    var docRef = _db.collection('users').doc(user.uid);
     var doc = await docRef.get();
-    DateTime today = DateTime.now();
 
-    if (doc.exists && _isToday(doc.data()?['lastRequest'].toDate())) {
-      int count = doc.data()?['count'] ?? 0;
-      if (count >= 10) {
-        showSnackBar(context,
-            'Daily limit reached. Please buy tokens to get more recipes.');
+    if (doc.exists) {
+      int tokens = doc.data()?['tokens'] ?? 0;
+      if (tokens <= 0) {
+        showSnackBar(context, 'No tokens left. Please buy more tokens.');
         return {};
       }
-    }
 
-    await docRef.set({
-      'count': FieldValue.increment(1),
-      'lastRequest': Timestamp.fromDate(today),
-    }, SetOptions(merge: true));
+      // Deduct one token
+      await docRef.update({
+        'tokens': FieldValue.increment(-1),
+      });
 
-    return _fetchRecipeWithIngredientsFromAPI(cuisine, ingredients,
-        context); // Assume this handles the API call and extracts data properly.
+      // Proceed with generating the recipe
+      return _fetchRecipeWithIngredientsFromAPI(cuisine, ingredients, context);
+    } else {
+      throw Exception('User document not found');
+    } // Assume this handles the API call and extracts data properly.
   }
 
   Future<Map<String, String>> _fetchRecipeWithIngredientsFromAPI(
@@ -144,7 +145,7 @@ class Auth {
         'Authorization': 'Bearer ${Constants.uri}',
       },
       body: jsonEncode({
-        'model': 'gpt-3.5-turbo-0125',
+        'model': 'gpt-4o-mini-2024-07-18',
         'messages': [
           {
             'role': 'user',

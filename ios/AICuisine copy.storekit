@@ -1,0 +1,100 @@
+{
+  "identifier" : "559D3C6C",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "4.99",
+      "familyShareable" : false,
+      "internalID" : "6503442277",
+      "localizations" : [
+        {
+          "description" : "Buy 10 token for more recipe",
+          "displayName" : "AICuisine 10 Tokens",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "aicuisine_499_10_tokens",
+      "referenceName" : "AICuisine-10-Token",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "9.99",
+      "familyShareable" : false,
+      "internalID" : "6503446287",
+      "localizations" : [
+        {
+          "description" : "aicuisine 30 recipes with 30 tokens",
+          "displayName" : "30 recipe 30 tokens",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "aicuisine_999_30_tokens",
+      "referenceName" : "AICuisine-30-tokens",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6503341584",
+    "_developerTeamID" : "U32UL87MFJ",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 739029510.92156005,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

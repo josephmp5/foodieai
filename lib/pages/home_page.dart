@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
         });
       }).catchError((error) {
         if (error.toString().contains('Daily limit reached')) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text(
                   'Daily limit reached. Please buy tokens to get more recipes.')));
         } else {
@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(40),
                       borderSide:
-                          const BorderSide(color: Colors.white, width: 2),
+                          const BorderSide(color: Colors.white, width: 3),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(40),
