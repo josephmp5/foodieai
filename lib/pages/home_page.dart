@@ -95,12 +95,27 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          title: const Text('Home Page'),
-          leading: IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: signout,
-          )),
+        backgroundColor: Colors.transparent,
+        title: const PreferredSize(
+          preferredSize: Size.fromHeight(60.0), // adjust the height as needed
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Select cuisine',
+                style:
+                    TextStyle(fontStyle: FontStyle.italic, color: Colors.white),
+              ),
+              Text(
+                'and click to Get Recipe to get your recipe',
+                style: TextStyle(
+                    fontWeight: FontWeight.normal, color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+        centerTitle: true, // center the column
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -183,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.black.withOpacity(0.1),
                         spreadRadius: 5,
                         blurRadius: 7,
-                        offset: Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),

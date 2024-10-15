@@ -15,19 +15,23 @@ class _IngredientsState extends State<Ingredients> {
   TextEditingController ingredientsController = TextEditingController();
 
   void recipe() async {
-    if (selectedCuisine == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a cuisine first')));
-    }
-    setState(() {
-      isLoading = true; // Start loading before the API call
-    });
+    if (selectedCuisine != null) {
+      setState(() {
+        isLoading = true; // Start loading before the API call
+      });
 
-    await auth.generateRecipewithIngredients(
-        selectedCuisine!, ingredientsController.text, context);
-    setState(() {
-      isLoading = false; // Stop loading after the API call
-    });
+      await auth.generateRecipewithIngredients(
+          selectedCuisine!, ingredientsController.text, context);
+      setState(() {
+        isLoading = false; // Stop loading after the API call
+      });
+    } else if (selectedCuisine == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a cuisine'),
+        ),
+      );
+    }
   }
 
   @override
@@ -36,7 +40,6 @@ class _IngredientsState extends State<Ingredients> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          title: const Text('Ingredients'),
         ),
         body: Container(
           decoration: const BoxDecoration(
@@ -55,6 +58,39 @@ class _IngredientsState extends State<Ingredients> {
                 ? const Center(child: CircularProgressIndicator())
                 : Column(
                     children: [
+                      const PreferredSize(
+                        preferredSize:
+                            Size.fromWidth(60.0), // adjust the height as needed
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Select cuisine',
+                              style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.white,
+                                  fontSize: 20),
+                            ),
+                            Text(
+                              'put ingredients that you have',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                  fontSize: 20),
+                            ),
+                            Text(
+                              'and generate a recipe',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: DropdownButtonFormField<String>(
@@ -143,7 +179,7 @@ class _IngredientsState extends State<Ingredients> {
                                 color: Colors.black.withOpacity(0.1),
                                 spreadRadius: 5,
                                 blurRadius: 7,
-                                offset: Offset(0, 3),
+                                offset: const Offset(0, 3),
                               ),
                             ],
                           ),
