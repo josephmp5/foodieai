@@ -19,7 +19,10 @@ class _RandomRecipeState extends State<RandomRecipe> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('Random Recipe'),
+        title: const Text(
+          'Your Delicious Meal Is Ready',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -41,12 +44,17 @@ class _RandomRecipeState extends State<RandomRecipe> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: CachedNetworkImage(
-                    imageUrl: widget.imageUrl,
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: CachedNetworkImage(
+                      imageUrl: widget.imageUrl,
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                      fadeInDuration: const Duration(milliseconds: 300),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 Padding(
@@ -55,6 +63,7 @@ class _RandomRecipeState extends State<RandomRecipe> {
                       style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white,
+                        fontFamily: 'Roboto',
                       )),
                 ),
               ],

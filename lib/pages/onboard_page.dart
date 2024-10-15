@@ -28,11 +28,26 @@ class _OnBoardPageState extends State<OnBoardPage> {
             ),
           ),
           child: Center(
-            child: ElevatedButton(
-              onPressed: anonymousLogin,
-              child: const Text('Continue'),
+              child: GestureDetector(
+            onTap: anonymousLogin,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                'Get Started',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 20,
+                ),
+              ),
             ),
-          ),
+          )),
         ));
   }
 }
