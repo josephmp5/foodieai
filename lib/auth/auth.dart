@@ -23,7 +23,7 @@ class Auth {
       if (user != null) {
         await FirebaseFirestore.instance.collection("users").doc(user.uid).set({
           'uid': user.uid,
-          'tokens': 2,
+          'tokens': 25,
         });
 
         await MyApp.navigatorKey.currentState?.pushReplacement(PageTransition(
@@ -40,7 +40,7 @@ class Auth {
     }
   }
 
-  Future<Map<String, String>> generateRecipe(
+  Future<Map<String, dynamic>> generateRecipe(
       String cuisine, BuildContext context) async {
     User? user = _auth.currentUser;
     if (user == null) throw Exception("User not logged in.");
@@ -68,13 +68,18 @@ class Auth {
       var imageTask = generateImage(recipeTitle);
 
       // Await both tasks to complete concurrently
-      var recipeText = await recipeTask;
+      var recipeData = await recipeTask;
       var imageUrl = await imageTask;
 
-      String sanitizedText = recipeText.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
+      // Extract data
+      String recipeName = recipeData['title'];
+      List<String> ingredients = List<String>.from(recipeData['ingredients']);
+      List<String> steps = List<String>.from(recipeData['steps']);
+
       return {
-        'recipeName': recipeTitle,
-        'recipeText': sanitizedText,
+        'recipeName': recipeName,
+        'ingredients': ingredients,
+        'steps': steps,
         'imageUrl': imageUrl
       };
     } else {
@@ -92,7 +97,7 @@ class Auth {
       body: jsonEncode({
         'model': 'gpt-4o-mini-2024-07-18',
         'max_tokens': 15, // Short max tokens to generate only a title
-        'temperature': 0.5,
+        'temperature': 0.8,
         'messages': [
           {
             'role': 'user',
@@ -110,7 +115,7 @@ class Auth {
     }
   }
 
-  Future<String> _fetchRecipeDetailsFromAPI(String title) async {
+  Future<Map<String, dynamic>> _fetchRecipeDetailsFromAPI(String title) async {
     var response = await http.post(
       Uri.parse('https://api.openai.com/v1/chat/completions'),
       headers: <String, String>{
@@ -119,26 +124,44 @@ class Auth {
       },
       body: jsonEncode({
         'model': 'gpt-4o-mini-2024-07-18',
-        'temperature': 0.5,
+        'temperature': 0.2,
         'messages': [
+          {
+            'role': 'system',
+            'content':
+                'You are a helpful assistant that outputs data in strict JSON format.'
+          },
           {
             'role': 'user',
             'content':
-                'Generate a simple recipe for: $title. Include ingredients and steps.'
+                'Generate a simple recipe for: $title. Include ingredients and steps. Output the result strictly in JSON format with keys "title", "ingredients", and "steps". Do not include any extra text or explanations.'
           }
         ]
       }),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body)['choices'][0]['message']['content'];
+      String content =
+          json.decode(response.body)['choices'][0]['message']['content'];
+
+      Map<String, dynamic> recipeData;
+
+      // JSON Parsing with Error Handling
+      try {
+        recipeData = json.decode(content);
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw Exception('Failed to parse recipe details. Please try again.');
+      }
+
+      return recipeData;
     } else {
       throw Exception('Failed to fetch recipe details: ${response.body}');
     }
   }
 
-  Future<Map<String, String>> generateRecipewithIngredients(
-      String cuisine, String ingredients, BuildContext context) async {
+  Future<Map<String, dynamic>> generateRecipewithIngredients(
+      String cuisine, String ingredientsInput, BuildContext context) async {
     User? user = _auth.currentUser;
     if (user == null) throw Exception("User not logged in.");
 
@@ -158,28 +181,41 @@ class Auth {
       });
 
       // Step 1: Generate the recipe title with ingredients first
-      String recipeTitle =
-          await _fetchRecipeWithIngredientsTitleFromAPI(cuisine, ingredients);
+      String recipeTitle = await _fetchRecipeWithIngredientsTitleFromAPI(
+          cuisine, ingredientsInput);
 
       // Step 2: Start generating detailed recipe and image concurrently
-      var recipeTask =
-          _fetchRecipeWithIngredientsDetailsFromAPI(recipeTitle, ingredients);
+      var recipeTask = _fetchRecipeWithIngredientsDetailsFromAPI(
+          recipeTitle, ingredientsInput);
       var imageTask = generateImage(recipeTitle);
 
       // Await both tasks to complete concurrently
-      var recipeText = await recipeTask;
+      var recipeData = await recipeTask;
       var imageUrl = await imageTask;
 
-      String sanitizedText = recipeText.replaceAll(RegExp(r'[^\x00-\x7F]'), '');
+      // Extract data
+      String recipeName = recipeData['title'];
+      List<String> ingredients = List<String>.from(recipeData['ingredients']);
+      List<String> steps = List<String>.from(recipeData['steps']);
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              RandomRecipe(recipeText: sanitizedText, imageUrl: imageUrl),
+          builder: (context) => RandomRecipe(
+            recipeTitle: recipeName,
+            ingredients: ingredients,
+            steps: steps,
+            imageUrl: imageUrl,
+          ),
         ),
       );
 
-      return {'recipeText': sanitizedText, 'imageUrl': imageUrl};
+      return {
+        'recipeTitle': recipeName,
+        'ingredients': ingredients,
+        'steps': steps,
+        'imageUrl': imageUrl
+      };
     } else {
       throw Exception('User document not found');
     }
@@ -214,7 +250,7 @@ class Auth {
     }
   }
 
-  Future<String> _fetchRecipeWithIngredientsDetailsFromAPI(
+  Future<Map<String, dynamic>> _fetchRecipeWithIngredientsDetailsFromAPI(
       String title, String ingredients) async {
     var response = await http.post(
       Uri.parse('https://api.openai.com/v1/chat/completions'),
@@ -224,19 +260,37 @@ class Auth {
       },
       body: jsonEncode({
         'model': 'gpt-4o-mini-2024-07-18',
-        'temperature': 0.5,
+        'temperature': 0.2,
         'messages': [
+          {
+            'role': 'system',
+            'content':
+                'You are a helpful assistant that outputs data in strict JSON format.'
+          },
           {
             'role': 'user',
             'content':
-                'Generate a simple recipe for: $title using these ingredients: $ingredients. Include steps.'
+                'Generate a simple recipe for: $title using these ingredients: $ingredients. Include steps. Output the result strictly in JSON format with keys "title", "ingredients", and "steps". Do not include any extra text or explanations.'
           }
         ]
       }),
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body)['choices'][0]['message']['content'];
+      String content =
+          json.decode(response.body)['choices'][0]['message']['content'];
+
+      Map<String, dynamic> recipeData;
+
+      // JSON Parsing with Error Handling
+      try {
+        recipeData = json.decode(content);
+      } catch (e) {
+        print('Error parsing JSON: $e');
+        throw Exception('Failed to parse recipe details. Please try again.');
+      }
+
+      return recipeData;
     } else {
       throw Exception('Failed to fetch recipe details: ${response.body}');
     }
@@ -251,10 +305,10 @@ class Auth {
           'Authorization': 'Bearer ${Constants.uri}',
         },
         body: jsonEncode({
-          'model': "dall-e-2",
+          'model': "dall-e-3",
           'prompt': prompt,
           'n': 1,
-          'size': '512x512',
+          'size': '1024x1024',
           'quality': "standard",
         }),
       );

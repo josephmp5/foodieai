@@ -49,13 +49,15 @@ class _HomePageState extends State<HomePage> {
 
       // Wait for the recipe to be ready
       recipeFuture.then((recipe) {
-        String recipeText = recipe['recipeText']!;
-        String imageUrl = recipe['imageUrl']!;
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                RandomRecipe(recipeText: recipeText, imageUrl: imageUrl),
+            builder: (context) => RandomRecipe(
+              recipeTitle: recipe['recipeName']!,
+              ingredients: recipe['ingredients']!,
+              steps: recipe['steps']!,
+              imageUrl: recipe['imageUrl']!,
+            ),
           ),
         ).then((_) {
           setState(() {
