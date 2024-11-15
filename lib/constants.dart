@@ -1,4 +1,5 @@
 class Constants {
-  static String uri =
-    'OPENAI_KEY_HERE';
+feature/#9
+  static String uri = 'OPENAI_KEY_HERE';
+
 }
