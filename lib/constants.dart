@@ -1,4 +1,4 @@
 class Constants {
   static String uri =
-      'OPENAI_KEY';
+    'OPENAI_KEY_HERE';
 }
