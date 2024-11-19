@@ -1,19 +1,36 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-class RandomRecipe extends StatelessWidget {
+class RandomRecipe extends StatefulWidget {
   final String recipeTitle;
   final List<String> ingredients;
   final List<String> steps;
-  final String imageUrl;
+  String? imageUrl;
 
-  const RandomRecipe({
+  RandomRecipe({
     Key? key,
     required this.recipeTitle,
     required this.ingredients,
     required this.steps,
-    required this.imageUrl,
+    this.imageUrl,
   }) : super(key: key);
+
+  @override
+  RandomRecipeState createState() => RandomRecipeState();
+}
+
+class RandomRecipeState extends State<RandomRecipe> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  // Method to update the imageUrl when it's available
+  void updateImage(String imageUrl) {
+    setState(() {
+      widget.imageUrl = imageUrl;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +48,16 @@ class RandomRecipe extends StatelessWidget {
               elevation: 0,
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.parallax,
-                background: CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) =>
-                      const Center(child: Icon(Icons.error)),
-                  fit: BoxFit.cover,
-                ),
+                background: widget.imageUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: widget.imageUrl!,
+                        placeholder: (context, url) =>
+                            const Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            const Center(child: Icon(Icons.error)),
+                        fit: BoxFit.cover,
+                      )
+                    : const Center(child: CircularProgressIndicator()),
               ),
             ),
           ];
@@ -70,7 +89,7 @@ class RandomRecipe extends StatelessWidget {
                             // Recipe Title
                             Center(
                               child: Text(
-                                recipeTitle,
+                                widget.recipeTitle,
                                 style: const TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
@@ -91,11 +110,11 @@ class RandomRecipe extends StatelessWidget {
                             Wrap(
                               spacing: 8.0,
                               runSpacing: 4.0,
-                              children: ingredients
+                              children: widget.ingredients
                                   .map((ingredient) => Chip(
                                         label: Text(
                                           ingredient,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.w700),
                                         ),
                                         backgroundColor:
@@ -112,18 +131,17 @@ class RandomRecipe extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-
                             // Steps List
                             ListView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: steps.length,
+                              itemCount: widget.steps.length,
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 8.0),
                                   child: Text(
-                                    '${index + 1}. ${steps[index]}',
+                                    '${index + 1}. ${widget.steps[index]}',
                                     style: const TextStyle(
                                       fontSize: 16,
                                     ),

@@ -5,8 +5,9 @@ import 'package:heutebinichrichbaba/pages/random_recipe.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key, required this.category});
 
+  final String category;
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -45,18 +46,24 @@ class _HomePageState extends State<HomePage> {
       _keepSpinning();
 
       // Start fetching the recipe immediately
-      var recipeFuture = auth.generateRecipe(selectedCuisine!, context);
+      var recipeFuture =
+          auth.generateRecipe(selectedCuisine!, context, widget.category);
 
       // Wait for the recipe to be ready
       recipeFuture.then((recipe) {
+        // Create a GlobalKey for RandomRecipeState
+        final randomRecipeKey = GlobalKey<RandomRecipeState>();
+
+        // Navigate to RandomRecipe page
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => RandomRecipe(
+              key: randomRecipeKey,
               recipeTitle: recipe['recipeName']!,
               ingredients: recipe['ingredients']!,
               steps: recipe['steps']!,
-              imageUrl: recipe['imageUrl']!,
+              imageUrl: null, // Initially, no image URL
             ),
           ),
         ).then((_) {
@@ -64,15 +71,20 @@ class _HomePageState extends State<HomePage> {
             isFetchingRecipe = false; // Reset state after coming back
           });
         });
+
+        // Start generating the image
+        var imageTask = auth.generateImage(recipe['recipeName']!);
+
+        // Update the image when it's ready
+        imageTask.then((imageUrl) {
+          randomRecipeKey.currentState?.updateImage(imageUrl);
+        }).catchError((error) {
+          // Handle image generation errors if necessary
+          print('Error generating image: $error');
+        });
       }).catchError((error) {
-        if (error.toString().contains('Daily limit reached')) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text(
-                  'Daily limit reached. Please buy tokens to get more recipes.')));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error fetching recipe: $error')));
-        }
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error fetching recipe: $error')));
         setState(() {
           isFetchingRecipe = false;
         });

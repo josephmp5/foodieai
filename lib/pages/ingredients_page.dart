@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:heutebinichrichbaba/auth/auth.dart';
+import 'package:heutebinichrichbaba/pages/random_recipe.dart';
 
 class Ingredients extends StatefulWidget {
-  const Ingredients({super.key});
+  Ingredients({Key? key, required this.category}) : super(key: key);
+  final String category;
 
   @override
   State<Ingredients> createState() => _IngredientsState();
@@ -11,190 +13,139 @@ class Ingredients extends StatefulWidget {
 class _IngredientsState extends State<Ingredients> {
   final Auth auth = Auth();
   String? selectedCuisine;
-  bool isLoading = false; // Added loading state
-  TextEditingController ingredientsController = TextEditingController();
+  String ingredientsInput = '';
+  bool isFetchingRecipe = false;
 
-  void recipe() async {
-    if (selectedCuisine != null) {
+  void fetchRecipeWithIngredients() {
+    if (!isFetchingRecipe &&
+        selectedCuisine != null &&
+        ingredientsInput.isNotEmpty) {
       setState(() {
-        isLoading = true; // Start loading before the API call
+        isFetchingRecipe = true;
       });
 
-      await auth.generateRecipewithIngredients(
-          selectedCuisine!, ingredientsController.text, context);
-      setState(() {
-        isLoading = false; // Stop loading after the API call
+      var recipeFuture = auth.generateRecipewithIngredients(
+          selectedCuisine!, ingredientsInput, context, widget.category);
+
+      recipeFuture.then((recipe) {
+        // Create a GlobalKey for RandomRecipeState
+        final randomRecipeKey = GlobalKey<RandomRecipeState>();
+
+        // Navigate to RandomRecipe page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RandomRecipe(
+              key: randomRecipeKey,
+              recipeTitle: recipe['recipeName']!,
+              ingredients: recipe['ingredients']!,
+              steps: recipe['steps']!,
+              imageUrl: null, // Initially, no image URL
+            ),
+          ),
+        ).then((_) {
+          setState(() {
+            isFetchingRecipe = false; // Reset state after coming back
+          });
+        });
+
+        // Start generating the image
+        var imageTask = auth.generateImage(recipe['recipeName']!);
+
+        // Update the image when it's ready
+        imageTask.then((imageUrl) {
+          randomRecipeKey.currentState?.updateImage(imageUrl);
+        }).catchError((error) {
+          // Handle image generation errors if necessary
+          print('Error generating image: $error');
+        });
+      }).catchError((error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error fetching recipe: $error')));
+        setState(() {
+          isFetchingRecipe = false;
+        });
       });
-    } else if (selectedCuisine == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a cuisine'),
-        ),
-      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Please select a cuisine and enter ingredients')));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color(0xFF00BFFF),
-                Color(0xFF1E90FF),
-                Color(0xFF00008B),
+      appBar: AppBar(title: const Text('Enter Ingredients')),
+      body: Stack(
+        children: [
+          // Main UI
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                // Dropdown for cuisine selection
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      labelText: 'Select Cuisine',
+                    ),
+                    value: selectedCuisine,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedCuisine = newValue;
+                      });
+                    },
+                    items: <String>[
+                      'Italian',
+                      'French',
+                      'Thai',
+                      'Chinese',
+                      'Turkish',
+                      'Indian',
+                      'Mexican',
+                      'Japanese',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Center(child: Text(value)),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                // TextField for ingredients input
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onChanged: (value) {
+                      ingredientsInput = value;
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Enter ingredients separated by commas',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: fetchRecipeWithIngredients,
+                  child: const Text('Get Recipe'),
+                ),
               ],
             ),
           ),
-          child: SafeArea(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      const PreferredSize(
-                        preferredSize:
-                            Size.fromWidth(60.0), // adjust the height as needed
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Select cuisine',
-                              style: TextStyle(
-                                  fontStyle: FontStyle.italic,
-                                  color: Colors.white,
-                                  fontSize: 20),
-                            ),
-                            Text(
-                              'put ingredients that you have',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                  fontSize: 20),
-                            ),
-                            Text(
-                              'and generate a recipe',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                  fontSize: 20),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(40),
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 2),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(40),
-                              borderSide: const BorderSide(color: Colors.white),
-                            ),
-                          ),
-                          hint: const Text(
-                            "Select Cuisine",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          value: selectedCuisine,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedCuisine = newValue;
-                            });
-                          },
-                          items: <String>[
-                            'Italian',
-                            'French',
-                            'Thai',
-                            'Chinese',
-                            'Turkish',
-                            'Indian',
-                            'Mexican',
-                            'Japanese',
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Center(child: Text(value)),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: SizedBox(
-                            height: 100,
-                            child: TextField(
-                              maxLines: null, // Set this
-                              expands: true, // and this
-                              keyboardType: TextInputType.multiline,
-                              controller: ingredientsController,
-                              decoration: InputDecoration(
-                                labelText: 'Enter Ingredients',
-                                labelStyle:
-                                    const TextStyle(color: Colors.white),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                  borderSide: const BorderSide(
-                                      color: Colors.white, width: 2),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                  borderSide:
-                                      const BorderSide(color: Colors.white),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      GestureDetector(
-                        onTap: recipe,
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.pinkAccent,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: const Text(
-                            'Get Recipe',
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ));
+          // Loading Indicator
+          if (isFetchingRecipe)
+            Container(
+              color:
+                  Colors.black.withOpacity(0.5), // Semi-transparent background
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
