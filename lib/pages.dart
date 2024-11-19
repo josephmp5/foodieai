@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:heutebinichrichbaba/pages/home_page.dart';
 import 'package:heutebinichrichbaba/pages/home_screen.dart';
-import 'package:heutebinichrichbaba/pages/ingredients_page.dart';
+import 'package:heutebinichrichbaba/pages/recipes_page.dart';
 
 class Pages extends StatefulWidget {
   const Pages({super.key});
@@ -16,7 +15,7 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -39,9 +38,8 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
       ),
       body: TabBarView(
         controller: _tabController,
-        children: <Widget>[
-          const HomePage(),
-          const Ingredients(),
+        children: const <Widget>[
+          RecipesPage(),
           HomeScreen(),
         ],
       ),
@@ -54,9 +52,9 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
               Radius.circular(50),
             ),
             child: Container(
-              color: const Color(0xFF4B0082),
+              color: const Color(0xFFF5FFFA),
               child: TabBar(
-                labelColor: Colors.white,
+                labelColor: Colors.black,
                 unselectedLabelColor: const Color(0xFF808080),
                 labelStyle: const TextStyle(fontSize: 13),
                 indicator: const UnderlineTabIndicator(
@@ -66,17 +64,10 @@ class _PagesState extends State<Pages> with SingleTickerProviderStateMixin {
                 tabs: [
                   Tab(
                     icon: Icon(
-                      Icons.home,
+                      Icons.add_home_rounded,
                       size: MediaQuery.of(context).size.width > 600 ? 48 : 30,
                     ),
-                    text: "Random Recipe",
-                  ),
-                  Tab(
-                    icon: Icon(
-                      Icons.heart_broken,
-                      size: MediaQuery.of(context).size.width > 600 ? 48 : 30,
-                    ),
-                    text: "Ingredients Recipe",
+                    text: "Recipe's Page",
                   ),
                   Tab(
                     icon: Icon(
