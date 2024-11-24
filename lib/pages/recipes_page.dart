@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:heutebinichrichbaba/cocktails/cocktail_ingredients.dart';
+import 'package:heutebinichrichbaba/cocktails/cocktail_recipe.dart';
 import 'package:heutebinichrichbaba/pages/home_page.dart';
 import 'package:heutebinichrichbaba/pages/ingredients_page.dart';
 
@@ -12,9 +14,9 @@ class RecipesPage extends StatefulWidget {
 class _RecipesPageState extends State<RecipesPage> {
   @override
   Widget build(BuildContext context) {
-    final String meal = 'meal';
-    final String dessert = 'dessert';
-    final String cocktail = 'cocktail';
+    const String meal = 'meal';
+    const String dessert = 'dessert';
+    const String cocktail = 'cocktail';
     // Calculate the available height for the cards
     final double screenHeight = MediaQuery.of(context).size.height;
     final double availableHeight = screenHeight * 0.6; // Adjust as needed
@@ -155,9 +157,8 @@ class _RecipesPageState extends State<RecipesPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => HomePage(
-                                  category: cocktail,
-                                )));
+                            builder: (context) =>
+                                const CocktailRecipe(category: cocktail)));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -246,7 +247,7 @@ class _RecipesPageState extends State<RecipesPage> {
                                       ),
                                       image: DecorationImage(
                                         image: AssetImage(
-                                            'assets/recipe_page/meal.png'),
+                                            'assets/recipe_page/chicken.png'),
                                         fit: BoxFit.cover,
                                         colorFilter: ColorFilter.mode(
                                           Colors.black45,
@@ -304,7 +305,7 @@ class _RecipesPageState extends State<RecipesPage> {
                                             ),
                                             image: DecorationImage(
                                               image: AssetImage(
-                                                  'assets/recipe_page/cake.png'),
+                                                  'assets/recipe_page/sufle.png'),
                                               fit: BoxFit.cover,
                                               colorFilter: ColorFilter.mode(
                                                 Colors.black45,
@@ -336,7 +337,8 @@ class _RecipesPageState extends State<RecipesPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          Ingredients(category: cocktail),
+                                          const CocktailIngredients(
+                                              category: cocktail),
                                     ),
                                   );
                                 },
@@ -357,7 +359,7 @@ class _RecipesPageState extends State<RecipesPage> {
                                             ),
                                             image: DecorationImage(
                                               image: AssetImage(
-                                                  'assets/recipe_page/cocktail.png'),
+                                                  'assets/recipe_page/mojito.png'),
                                               fit: BoxFit.cover,
                                               colorFilter: ColorFilter.mode(
                                                 Colors.black45,

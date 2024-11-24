@@ -23,7 +23,7 @@ class _OnBoardPageState extends State<OnBoardPage> {
         body: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/gay.png'),
+              image: AssetImage('assets/onboard.png'),
               fit: BoxFit.none,
             ),
           ),
