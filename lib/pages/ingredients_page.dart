@@ -75,76 +75,116 @@ class _IngredientsState extends State<Ingredients> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Enter Ingredients')),
-      body: Stack(
-        children: [
-          // Main UI
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                // Dropdown for cuisine selection
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      labelText: 'Select Cuisine',
-                    ),
-                    value: selectedCuisine,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedCuisine = newValue;
-                      });
-                    },
-                    items: <String>[
-                      'Italian',
-                      'French',
-                      'Thai',
-                      'Chinese',
-                      'Turkish',
-                      'Indian',
-                      'Mexican',
-                      'Japanese',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Center(child: Text(value)),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // TextField for ingredients input
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    onChanged: (value) {
-                      ingredientsInput = value;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Enter ingredients separated by commas',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: fetchRecipeWithIngredients,
-                  child: const Text('Get Recipe'),
-                ),
-              ],
-            ),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text('Type Your Ingredients'),
+        backgroundColor: Colors.transparent,
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF4FAFF),
+              Color(0xFFF3F9FF),
+              Color(0xFFF2F9FF),
+            ],
           ),
-          // Loading Indicator
-          if (isFetchingRecipe)
-            Container(
-              color:
-                  Colors.black.withOpacity(0.5), // Semi-transparent background
-              child: const Center(
-                child: CircularProgressIndicator(),
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              // Main UI
+              SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    const Text(
+                      'Select cuisine',
+                      style: TextStyle(
+                          fontStyle: FontStyle.italic,
+                          color: Colors.black,
+                          fontSize: 20),
+                    ),
+                    const Text(
+                      'and type your ingredients to get your recipe',
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                          fontSize: 18),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    // Dropdown for cuisine selection
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          labelText: 'Select Cuisine',
+                        ),
+                        value: selectedCuisine,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedCuisine = newValue;
+                          });
+                        },
+                        items: <String>[
+                          'Italian',
+                          'French',
+                          'Thai',
+                          'Chinese',
+                          'Turkish',
+                          'Indian',
+                          'Mexican',
+                          'Japanese',
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Center(child: Text(value)),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    // TextField for ingredients input
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (value) {
+                          ingredientsInput = value;
+                        },
+                        decoration: const InputDecoration(
+                          labelText: 'Enter ingredients separated by commas',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: fetchRecipeWithIngredients,
+                      child: const Text('Get Recipe'),
+                    ),
+                  ],
+                ),
               ),
-            ),
-        ],
+              // Loading Indicator
+              if (isFetchingRecipe)
+                Container(
+                  color: Colors.black
+                      .withOpacity(0.5), // Semi-transparent background
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

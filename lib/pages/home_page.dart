@@ -1,3 +1,4 @@
+import 'dart:math'; // Import for Random
 import 'package:flutter/material.dart';
 import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
 import 'package:heutebinichrichbaba/auth/auth.dart';
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
   String? selectedCuisine;
   final selected = BehaviorSubject<int>();
   bool isFetchingRecipe = false;
+  bool showLoadingIndicator = false; // New state variable
 
   void signout() async {
     await auth.signOut(context);
@@ -40,10 +42,10 @@ class _HomePageState extends State<HomePage> {
     if (!isFetchingRecipe && selectedCuisine != null) {
       setState(() {
         isFetchingRecipe = true;
+        // Start the wheel spinning to a random index
+        final randomIndex = Random().nextInt(imageAssets.length);
+        selected.add(randomIndex);
       });
-
-      // Keep the wheel spinning
-      _keepSpinning();
 
       // Start fetching the recipe immediately
       var recipeFuture =
@@ -69,6 +71,7 @@ class _HomePageState extends State<HomePage> {
         ).then((_) {
           setState(() {
             isFetchingRecipe = false; // Reset state after coming back
+            showLoadingIndicator = false; // Reset loading indicator
           });
         });
 
@@ -87,21 +90,13 @@ class _HomePageState extends State<HomePage> {
             SnackBar(content: Text('Error fetching recipe: $error')));
         setState(() {
           isFetchingRecipe = false;
+          showLoadingIndicator = false; // Reset loading indicator
         });
       });
     } else if (selectedCuisine == null) {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a cuisine first')));
     }
-  }
-
-  void _keepSpinning() {
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (isFetchingRecipe) {
-        selected.add(Fortune.randomInt(0, imageAssets.length));
-        _keepSpinning();
-      }
-    });
   }
 
   @override
@@ -112,20 +107,9 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.transparent,
         title: const PreferredSize(
           preferredSize: Size.fromHeight(60.0), // adjust the height as needed
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Select cuisine',
-                style:
-                    TextStyle(fontStyle: FontStyle.italic, color: Colors.white),
-              ),
-              Text(
-                'and click to Get Recipe to get your recipe',
-                style: TextStyle(
-                    fontWeight: FontWeight.normal, color: Colors.white),
-              ),
-            ],
+          child: Text(
+            'Select cuisine and click to\n Get Recipe to get your recipe',
+            style: TextStyle(fontStyle: FontStyle.italic, color: Colors.black),
           ),
         ),
         centerTitle: true, // center the column
@@ -136,9 +120,9 @@ class _HomePageState extends State<HomePage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF00BFFF),
-              Color(0xFF1E90FF),
-              Color(0xFF00008B),
+              Color(0xFFF4FAFF),
+              Color(0xFFF3F9FF),
+              Color(0xFFF2F9FF),
             ],
           ),
         ),
@@ -153,16 +137,16 @@ class _HomePageState extends State<HomePage> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(40),
                       borderSide:
-                          const BorderSide(color: Colors.white, width: 3),
+                          const BorderSide(color: Colors.black, width: 3),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(40),
-                      borderSide: const BorderSide(color: Colors.white),
+                      borderSide: const BorderSide(color: Colors.black),
                     ),
                   ),
                   hint: const Text(
                     "Select Cuisine",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.black),
                   ),
                   value: selectedCuisine,
                   onChanged: (String? newValue) {
@@ -190,14 +174,30 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 15),
               SizedBox(
                 height: 300,
-                child: FortuneWheel(
-                  selected: selected.stream,
-                  animateFirst: false,
-                  items: imageAssets
-                      .map((path) => FortuneItem(
-                          child: Image.asset(path, width: 80, height: 80)))
-                      .toList(),
-                ),
+                child: isFetchingRecipe
+                    ? (showLoadingIndicator
+                        ? const Center(child: CircularProgressIndicator())
+                        : FortuneWheel(
+                            selected: selected.stream,
+                            onAnimationEnd: () {
+                              setState(() {
+                                showLoadingIndicator = true;
+                              });
+                            },
+                            items: imageAssets
+                                .map((path) => FortuneItem(
+                                    child: Image.asset(path,
+                                        width: 80, height: 80)))
+                                .toList(),
+                          ))
+                    : FortuneWheel(
+                        selected: selected.stream,
+                        items: imageAssets
+                            .map((path) => FortuneItem(
+                                child:
+                                    Image.asset(path, width: 80, height: 80)))
+                            .toList(),
+                      ),
               ),
               const SizedBox(height: 30),
               GestureDetector(
