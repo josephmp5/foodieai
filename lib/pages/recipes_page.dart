@@ -3,6 +3,7 @@ import 'package:heutebinichrichbaba/cocktails/cocktail_ingredients.dart';
 import 'package:heutebinichrichbaba/cocktails/cocktail_recipe.dart';
 import 'package:heutebinichrichbaba/pages/home_page.dart';
 import 'package:heutebinichrichbaba/pages/ingredients_page.dart';
+import 'package:page_transition/page_transition.dart';
 
 class RecipesPage extends StatefulWidget {
   const RecipesPage({super.key});
@@ -23,6 +24,13 @@ class _RecipesPageState extends State<RecipesPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        title: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+                "Choose between meal, dessert \n or cocktail  and click to get a recipe"),
+          ),
+        ),
         backgroundColor: Colors.transparent,
       ),
       body: Container(
@@ -31,9 +39,9 @@ class _RecipesPageState extends State<RecipesPage> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFFFFAF0),
-              Color(0xFFF0FFFF),
-              Color(0xFFF0F8FF),
+              Color(0xFFF4FAFF),
+              Color(0xFFF3F9FF),
+              Color(0xFFF2F9FF),
             ],
           ),
         ),
@@ -42,15 +50,18 @@ class _RecipesPageState extends State<RecipesPage> {
             physics: const BouncingScrollPhysics(),
             child: Column(
               children: [
+                const SizedBox(
+                  height: 10,
+                ),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      'Recipe Ideas',
+                      'Get a random recipe',
                       style: TextStyle(
                           color: Colors.black,
-                          fontSize: 30,
+                          fontSize: 25,
                           fontWeight: FontWeight.w700),
                     ),
                   ),
@@ -59,10 +70,9 @@ class _RecipesPageState extends State<RecipesPage> {
                   onTap: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => HomePage(
-                                  category: meal,
-                                )));
+                        PageTransition(
+                            child: HomePage(category: meal),
+                            type: PageTransitionType.rightToLeft));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -108,10 +118,9 @@ class _RecipesPageState extends State<RecipesPage> {
                   onTap: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => HomePage(
-                                  category: dessert,
-                                )));
+                        PageTransition(
+                            child: HomePage(category: dessert),
+                            type: PageTransitionType.rightToLeft));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -156,9 +165,9 @@ class _RecipesPageState extends State<RecipesPage> {
                   onTap: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                const CocktailRecipe(category: cocktail)));
+                        PageTransition(
+                            child: const CocktailRecipe(category: cocktail),
+                            type: PageTransitionType.rightToLeft));
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -223,12 +232,10 @@ class _RecipesPageState extends State<RecipesPage> {
                         child: GestureDetector(
                           onTap: () {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    Ingredients(category: meal),
-                              ),
-                            );
+                                context,
+                                PageTransition(
+                                    child: Ingredients(category: meal),
+                                    type: PageTransitionType.rightToLeft));
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -281,12 +288,11 @@ class _RecipesPageState extends State<RecipesPage> {
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          Ingredients(category: dessert),
-                                    ),
-                                  );
+                                      context,
+                                      PageTransition(
+                                          child: Ingredients(category: dessert),
+                                          type:
+                                              PageTransitionType.rightToLeft));
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -334,13 +340,12 @@ class _RecipesPageState extends State<RecipesPage> {
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const CocktailIngredients(
+                                      context,
+                                      PageTransition(
+                                          child: const CocktailIngredients(
                                               category: cocktail),
-                                    ),
-                                  );
+                                          type:
+                                              PageTransitionType.rightToLeft));
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),

@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.transparent,
         title: const Text(
           'Token Sales',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.black),
         ),
       ),
       body: Container(
@@ -93,9 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFF00BFFF),
-              Color(0xFF1E90FF),
-              Color(0xFF00008B),
+              Color(0xFFF4FAFF),
+              Color(0xFFF3F9FF),
+              Color(0xFFF2F9FF),
             ],
           ),
         ),
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               Text('Current Tokens: $_tokenCount',
-                  style: const TextStyle(color: Colors.white)),
+                  style: const TextStyle(color: Colors.black)),
               Expanded(
                 child: Center(
                   child: Padding(

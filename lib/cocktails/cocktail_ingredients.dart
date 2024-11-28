@@ -71,42 +71,58 @@ class _CocktailIngredientsState extends State<CocktailIngredients> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Enter Ingredients')),
-      body: Stack(
-        children: [
-          // Main UI
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    onChanged: (value) {
-                      ingredientsInput = value;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Enter ingredients separated by commas',
-                      border: OutlineInputBorder(),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: const Text('Enter Ingredients'),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF4FAFF),
+              Color(0xFFF3F9FF),
+              Color(0xFFF2F9FF),
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            // Main UI
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onChanged: (value) {
+                        ingredientsInput = value;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Enter ingredients separated by commas',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: fetchRecipeWithIngredients,
-                  child: const Text('Get Recipe'),
-                ),
-              ],
-            ),
-          ),
-          // Loading Indicator
-          if (isFetchingRecipe)
-            Container(
-              color:
-                  Colors.black.withOpacity(0.5), // Semi-transparent background
-              child: const Center(
-                child: CircularProgressIndicator(),
+                  ElevatedButton(
+                    onPressed: fetchRecipeWithIngredients,
+                    child: const Text('Get Recipe'),
+                  ),
+                ],
               ),
             ),
-        ],
+            // Loading Indicator
+            if (isFetchingRecipe)
+              Container(
+                color: Colors.black
+                    .withOpacity(0.5), // Semi-transparent background
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

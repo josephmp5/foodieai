@@ -22,7 +22,7 @@ class Auth {
       if (user != null) {
         await FirebaseFirestore.instance.collection("users").doc(user.uid).set({
           'uid': user.uid,
-          'tokens': 25,
+          'tokens': 2,
         });
 
         await MyApp.navigatorKey.currentState?.pushReplacement(PageTransition(
@@ -110,7 +110,7 @@ class Auth {
 
       print('Raw API Response: $content');
 
-      Map<String, dynamic> recipeData;
+      Map<String, dynamic> recipeData = {};
 
       String sanitizedContent = content.replaceAll(RegExp(r'[^\x20-\x7E]'), '');
 
@@ -206,7 +206,7 @@ class Auth {
 
       print('Raw API Response: $content');
 
-      Map<String, dynamic> recipeData;
+      Map<String, dynamic> recipeData = {};
 
       String sanitizedContent = content.replaceAll(RegExp(r'[^\x20-\x7E]'), '');
 
@@ -220,8 +220,12 @@ class Auth {
           throw Exception('No JSON object found in the response.');
         }
       } catch (e) {
-        print('Error parsing JSON: $e');
-        throw Exception('Failed to parse recipe details. Please try again.');
+        const SnackBar(
+          content: Text(
+            'Service is currently unavailable. Please try again later.',
+            style: TextStyle(color: Colors.white),
+          ),
+        );
       }
 
       return recipeData;

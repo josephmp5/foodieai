@@ -61,20 +61,42 @@ class _CocktailRecipeState extends State<CocktailRecipe> {
     }
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: const Text('Cocktail Recipe'),
       ),
-      body: Column(
-        children: [
-          Center(
-            child: ElevatedButton(
-              onPressed: fetchCocktailRecipe,
-              child: const Text('Get Cocktail Recipe'),
-            ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFF4FAFF),
+              Color(0xFFF3F9FF),
+              Color(0xFFF2F9FF),
+            ],
           ),
-          if (isFetchingRecipe)
-            const Center(child: CircularProgressIndicator()),
-        ],
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset('assets/cocktail2.png'),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                  onPressed: fetchCocktailRecipe,
+                  child: const Text('Get Cocktail Recipe'),
+                ),
+              ),
+              if (isFetchingRecipe)
+                const Center(child: CircularProgressIndicator()),
+            ],
+          ),
+        ),
       ),
     );
   }
